@@ -1,7 +1,8 @@
 <?php
-$idStranky = "domu";
-
 require_once "./data.php";
+$idStranky = array_keys($poleStranek)[0];
+
+
 
 if (array_key_exists("id-stranky", $_GET)) {
     $idStranky = $_GET["id-stranky"];
@@ -46,8 +47,11 @@ if (array_key_exists("id-stranky", $_GET)) {
 
     <!-- zde bude section -->
     <?php
+
+        echo $poleStranek[$idStranky]->getObsah();
+
         //xxx.html
-        require_once "./$idStranky.html";
+        //require_once "./$idStranky.html";
     ?>
 
     <footer>

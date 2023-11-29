@@ -27,6 +27,21 @@ if (array_key_exists("logout-submit", $_GET)) {
 //kontrola zda je uzivatel prihlaseny
 //nektere operace chcem porvest jen kdyz je prihlaseny
 if (array_key_exists("jePrihlasen", $_SESSION)) {
+    //zpracujeme mazani stranky
+    if (array_key_exists("delete", $_GET)) {
+        $idStranky = $_GET["delete"];
+        $poleStranek[$idStranky]->smazMe();
+
+        //presmerujeme uzivatele na cistou URL
+        header("Location: ?");
+        exit;
+    }
+
+    //zpracujeme formulare pro vytvoreni nove stranky
+    if (array_key_exists("new", $_GET)) {
+        //vytvorime isntaci ktera budem mit ve vsech vlastnostech prazdny string
+        $aktivniInstance = new Stranka("", "", "", "");
+    }
 
     //zpracujeme formular pro editovani stranky
     if (array_key_exists("edit", $_GET)) {
@@ -37,10 +52,36 @@ if (array_key_exists("jePrihlasen", $_SESSION)) {
 
     //zpracujeme formular pro ulozeni stranky
     if (array_key_exists("aktualizovat-submit", $_POST)) {
+        //kontrola zda id neni prazdne, pokud ano, tak ho presmerujem zpet na homepage adminu
+        //tomuto if se rika "guarding clause"
+        if (trim($_POST["id-stranky"]) == "") {
+            header("Location: ?");
+            exit;
+        }
+
+        //vytahneme data z formualre
+        //trimneme id stranky aby nebyly mezery pred a za
+        $idStranky = trim($_POST["id-stranky"]);
+        $titulekStranky = $_POST["titulek-stranky"];
+        $menuStranky = $_POST["menu-stranky"];
+        $obrazekStranky = $_POST["obrazek-stranky"];
+        //vloziem tyto data do isntance
+        $aktivniInstance->setId($idStranky);
+        $aktivniInstance->setTitulek($titulekStranky);
+        $aktivniInstance->setMenu($menuStranky);
+        $aktivniInstance->setObrazek($obrazekStranky);
+
+        //propiseme zmeny do DB
+        $aktivniInstance->propisDoDb();
+
         //zjistime si novy obsah texarea
         $obsahStranky = $_POST["obsah-stranky"];
         //nyni zavolame metodu setObsah a do argumentu dame ten novy text souboru
         $aktivniInstance->setObsah($obsahStranky);
+
+        //presmerujeme ho na novou url s novym id
+        header("Location: ?edit=$idStranky");
+        exit;
     }
 
 }//endKontrolaPrihlaseni
@@ -66,6 +107,12 @@ if (array_key_exists("jePrihlasen", $_SESSION)) {
 
         //pripojime seznam stranek, ktere muze editovat
         require_once "./seznam-stranek.php";
+
+        echo "<hr>";
+        //toto je odkaz ktery zpracujeme jako GET formular a zobrazime uzivateli prazdny WYSISYG
+        echo "<a href='?new'>VYTVOŘIT NOVOU STRÁNKU</a>";
+        echo "<hr>";
+
 
         //pripojime editor stranek jen pokud uzivatel zvolil nejakou konkretni stranku pro editovani
         if ($aktivniInstance != "") {
