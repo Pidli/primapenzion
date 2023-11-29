@@ -14,6 +14,7 @@ class Stranka {
     private $obrazek;
     private $oldId = "";
 
+
     function __construct($argId, $argTitulek, $argMenu, $argObrazek) {
         $this->id = $argId;
         $this->titulek = $argTitulek;
@@ -92,15 +93,9 @@ class Stranka {
     }
 
     function propisDoDb() {
-
         if ($this->oldId == "") {
             //nejprve zjsitit nejvyssi cislo v DB ve sloupecku poradi
-            $prikaz = $GLOBALS["instanceDB"]->prepare("SELECT MAX(poradi) AS max_hodnota FROM stranka");
-            $prikaz->execute();
-            $vysledek = $prikaz->fetch();
-            $maxHodnotaPoradi = $vysledek["max_hodnota"];
-            $maxHodnotaPoradi += 1;
-
+            $maxHodnotaPoradi = $this->dejMiNoveNejvyssiPoradi();
 
             $prikaz = $GLOBALS["instanceDB"]->prepare("INSERT INTO stranka SET id=:id, titulek=:titulek, menu=:menu, obrazek=:obrazek, poradi=:poradi");
             $prikaz->bindParam(":id", $this->id, PDO::PARAM_STR);
@@ -125,6 +120,15 @@ class Stranka {
         $prikaz = $GLOBALS["instanceDB"]->prepare("DELETE FROM stranka WHERE id=:id");
         $prikaz->bindParam(":id", $this->id, PDO::PARAM_STR);
         $prikaz->execute();
+    }
+
+    function dejMiNoveNejvyssiPoradi() {
+        $prikaz = $GLOBALS["instanceDB"]->prepare("SELECT MAX(poradi) AS max_hodnota FROM stranka");
+        $prikaz->execute();
+        $vysledek = $prikaz->fetch();
+        $maxHodnotaPoradi = $vysledek["max_hodnota"];
+        $maxHodnotaPoradi += 1;
+        return $maxHodnotaPoradi;
     }
 
 }//endStranka
