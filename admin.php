@@ -27,6 +27,18 @@ if (array_key_exists("logout-submit", $_GET)) {
 //kontrola zda je uzivatel prihlaseny
 //nektere operace chcem porvest jen kdyz je prihlaseny
 if (array_key_exists("jePrihlasen", $_SESSION)) {
+    //zpracovani ajax formulare
+    if (array_key_exists("razeniSubmit", $_POST)) {
+        $poleId = $_POST["poleSerazenychId"];
+        //propiseme data do DB
+        //zavolame statickou metodu seradStranky tridy Stranka
+        Stranka::seradStranky($poleId);
+        
+        //posleme odpoved do JS a ukoncime pozadavek
+        echo "OK";
+        exit;
+    }
+
     //zpracujeme mazani stranky
     if (array_key_exists("delete", $_GET)) {
         $idStranky = $_GET["delete"];
@@ -124,5 +136,12 @@ if (array_key_exists("jePrihlasen", $_SESSION)) {
     }
     ?>
 
+
+    <!-- pripojime knihovnu jquery a jqueryui -->
+    <!-- composer require components/jquery -->
+    <!-- composer require components/jqueryui -->
+    <script src="./vendor/components/jquery/jquery.js"></script>
+    <script src="./vendor/components/jqueryui/jquery-ui.js"></script>
+    <script src="./js/admin.js"></script>
 </body>
 </html>

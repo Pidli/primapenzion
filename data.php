@@ -22,6 +22,15 @@ class Stranka {
         $this->obrazek = $argObrazek; 
     }
 
+    static function seradStranky($argPoleId) {
+        foreach ($argPoleId AS $index => $idStranky) {
+            $prikaz = $GLOBALS["instanceDB"]->prepare("UPDATE stranka SET poradi=:poradi WHERE id=:id");
+            $prikaz->bindParam(":poradi", $index);
+            $prikaz->bindParam(":id",$idStranky );
+            $prikaz->execute();
+        }
+    }
+
     function getTitulek() {
         return $this->titulek;
     }
@@ -111,7 +120,6 @@ class Stranka {
             $prikaz->bindParam(":obrazek", $this->obrazek, PDO::PARAM_STR);
             $prikaz->bindParam(":oldId", $this->oldId, PDO::PARAM_STR);
         }
-
         $prikaz->execute();
     }
 
