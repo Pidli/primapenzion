@@ -22,6 +22,15 @@ class Stranka {
         $this->obrazek = $argObrazek; 
     }
 
+    static function vytahnyVsechnyStranky() {
+        //posleme SQL do DB a vytahneme data
+        $prikaz = $GLOBALS["instanceDB"]->prepare("SELECT * FROM stranka ORDER BY poradi ASC");
+        $prikaz->execute();
+        $poleVysledku = $prikaz->fetchAll();
+
+        return $poleVysledku;
+    }
+
     static function seradStranky($argPoleId) {
         foreach ($argPoleId AS $index => $idStranky) {
             $prikaz = $GLOBALS["instanceDB"]->prepare("UPDATE stranka SET poradi=:poradi WHERE id=:id");
@@ -143,10 +152,9 @@ class Stranka {
 
 //prazdne pole stranek
 $poleStranek = array();
-//posleme SQL do DB a vytahneme data
-$prikaz = $instanceDB->prepare("SELECT * FROM stranka ORDER BY poradi ASC");
-$prikaz->execute();
-$poleVysledku = $prikaz->fetchAll();
+
+$poleVysledku = Stranka::vytahnyVsechnyStranky();
+
 //podle dat z DB vytovrime insatnce a vlozime je do pole
 //var_dump($poleVysledku);
 foreach($poleVysledku AS $vysledek) {

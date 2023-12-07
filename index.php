@@ -1,8 +1,11 @@
 <?php
+// pripojime sem composer autoload
+// stahnme si knihovnu primakurzy/shortcode
+// composer require primakurzy/shortcode
+require_once "./vendor/autoload.php";
+
 require_once "./data.php";
 $idStranky = array_keys($poleStranek)[0];
-
-
 
 if (array_key_exists("id-stranky", $_GET)) {
     $idStranky = $_GET["id-stranky"];
@@ -48,7 +51,14 @@ if (array_key_exists("id-stranky", $_GET)) {
     <!-- zde bude section -->
     <?php
 
-        echo $poleStranek[$idStranky]->getObsah();
+
+        $surovyObsah = $poleStranek[$idStranky]->getObsah();
+        //surovy obsah v sobe ma znacky, ktere vypadaji takto [kocka]
+        //knihovna shorcode zkusi v surovem obsahu anji vsehcny tyhle znaky a nahradi je za require "kocka.php"
+        //prvni parametr je cesta k slozce kte jsou vsechny php soubory ulozeny a druhy paramentr je surovy obsah
+        $hotovyObsah = primakurzy\Shortcode\Processor::process("./moje-shortcody", $surovyObsah);
+
+        echo $hotovyObsah;
 
         //xxx.html
         //require_once "./$idStranky.html";

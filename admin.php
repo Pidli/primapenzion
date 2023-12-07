@@ -12,6 +12,8 @@ if (array_key_exists("login-submit", $_POST)) {
 
     if ($zadaneJmeno == "admin" && $zadaneHeslo == "cici123") {
         $_SESSION["jePrihlasen"] = true;
+        $token = rand(1000, 9999);
+        $_SESSION["token"] = $token;
     }
 }
 
@@ -19,6 +21,8 @@ if (array_key_exists("login-submit", $_POST)) {
 if (array_key_exists("logout-submit", $_GET)) {
     //odhlasime uzavetel tim, ze odstarnme klic ze sessiony
     unset($_SESSION["jePrihlasen"]);
+    //smazeme token
+    unset($_SESSION["token"]);
     //procistime url aby nam to slovo "login-submit" zmizelo
     header("Location: ?");
     exit;
@@ -42,6 +46,16 @@ if (array_key_exists("jePrihlasen", $_SESSION)) {
     //zpracujeme mazani stranky
     if (array_key_exists("delete", $_GET)) {
         $idStranky = $_GET["delete"];
+        $tokenPozadavku = $_GET["token"];
+
+        //guarding clause
+        //hlidac
+        if ($tokenPozadavku != $_SESSION["token"]) {
+            //tokeny se nerovnaji
+            header("Location: ?");
+            exit;
+        }
+
         $poleStranek[$idStranky]->smazMe();
 
         //presmerujeme uzivatele na cistou URL
